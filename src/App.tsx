@@ -14,6 +14,8 @@ function App() {
   const [structuredProblem, setStructuredProblem] = useState<ProblemStructure | null>(null);
   const [solution, setSolution] = useState<SolutionResult | null>(null);
 
+  const statusLabel = isLoading ? '문제를 분석하고 있습니다...' : selectedFile ? '이미지 업로드 완료' : '이미지를 업로드해 주세요';
+
   const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0] ?? null;
     if (!file) {
@@ -58,31 +60,51 @@ function App() {
 
   return (
     <div className="app-shell">
-      <header>
-        <h1>수학 문제 풀이 AI</h1>
-        <p>이미지 업로드로 문제를 인식하고, 단계별 풀이와 핵심 개념까지 제공합니다.</p>
+      <header className="hero-card">
+        <div>
+          <p className="eyebrow">AI 수학 문제 풀이</p>
+          <h1>사진 한 장으로 문제를 이해하고 풀이까지 받아보세요.</h1>
+          <p className="hero-text">
+            업로드한 수학 문제 이미지를 OCR과 AI가 함께 분석해, 단계별 풀이와 핵심 개념을 정리해드립니다.
+          </p>
+        </div>
+        <div className="hero-badge">학생용 · 고등학교 수준</div>
       </header>
 
       <label className="upload-card">
         <input type="file" accept="image/png,image/jpeg,image/jpg,image/webp" onChange={handleFileChange} />
-        <span>{selectedFile ? selectedFile.name : '수학 문제 이미지 업로드'}</span>
+        <div className="upload-content">
+          <div className="upload-icon">📷</div>
+          <div>
+            <strong>{selectedFile ? selectedFile.name : '수학 문제 이미지 업로드'}</strong>
+            <p>PNG, JPG, JPEG, WEBP 형식을 지원합니다.</p>
+          </div>
+        </div>
       </label>
 
-      {isLoading && <div className="status">문제를 분석하고 있습니다...</div>}
-      {errorMessage && <div className="error">{errorMessage}</div>}
+      <div className="status-row">
+        <span className={`status-pill ${isLoading ? 'loading' : ''}`}>{statusLabel}</span>
+        {errorMessage && <div className="error">{errorMessage}</div>}
+      </div>
 
       <div className="grid">
         <section className="panel">
-          <h2>업로드된 이미지</h2>
-          {previewUrl ? <img src={previewUrl} alt="uploaded problem" className="preview-image" /> : <p>이미지를 업로드하면 미리보기가 표시됩니다.</p>}
+          <div className="panel-title-row">
+            <h2>업로드 이미지</h2>
+            <span>Preview</span>
+          </div>
+          {previewUrl ? <img src={previewUrl} alt="uploaded problem" className="preview-image" /> : <p className="empty-state">이미지를 업로드하면 미리보기가 표시됩니다.</p>}
         </section>
 
         <section className="panel">
-          <h2>문제 인식 결과</h2>
-          <p>{summary || '인식된 문제가 없습니다.'}</p>
+          <div className="panel-title-row">
+            <h2>문제 인식 결과</h2>
+            <span>OCR</span>
+          </div>
+          <p className="summary-text">{summary || '인식된 문제가 없습니다.'}</p>
           {structuredProblem && (
             <div className="meta-block">
-              <h3>구조화된 정보</h3>
+              <h3>조건</h3>
               <ul>
                 {structuredProblem.conditions.map((condition) => (
                   <li key={condition}>{condition}</li>
@@ -103,17 +125,23 @@ function App() {
         </section>
       </div>
 
-      <section className="panel">
-        <h2>풀이</h2>
+      <section className="panel wide-panel">
+        <div className="panel-title-row">
+          <h2>풀이 과정</h2>
+          <span>Step-by-step</span>
+        </div>
         {solution ? (
           <>
             <p className="summary">{solution.problem_summary}</p>
-            <ol>
+            <ol className="step-list">
               {solution.solution_steps.map((step) => (
-                <li key={step.step}>
-                  <strong>{step.title}</strong>
-                  <p>{step.explanation}</p>
-                  {step.equation && <pre>{step.equation}</pre>}
+                <li key={step.step} className="step-item">
+                  <div className="step-number">{step.step}</div>
+                  <div>
+                    <strong>{step.title}</strong>
+                    <p>{step.explanation}</p>
+                    {step.equation && <pre>{step.equation}</pre>}
+                  </div>
                 </li>
               ))}
             </ol>
@@ -123,23 +151,26 @@ function App() {
             </div>
           </>
         ) : (
-          <p>풀이 결과가 아직 없습니다.</p>
+          <p className="empty-state">풀이 결과가 아직 없습니다.</p>
         )}
       </section>
 
-      <section className="panel">
-        <h2>핵심 개념</h2>
+      <section className="panel wide-panel">
+        <div className="panel-title-row">
+          <h2>핵심 개념</h2>
+          <span>Concepts</span>
+        </div>
         {solution?.key_concepts?.length ? (
-          <ul>
+          <div className="concept-grid">
             {solution.key_concepts.map((concept) => (
-              <li key={concept.name}>
+              <div key={concept.name} className="concept-card">
                 <strong>{concept.name}</strong>
                 <p>{concept.explanation}</p>
-              </li>
+              </div>
             ))}
-          </ul>
+          </div>
         ) : (
-          <p>핵심 개념이 아직 없습니다.</p>
+          <p className="empty-state">핵심 개념이 아직 없습니다.</p>
         )}
       </section>
     </div>
