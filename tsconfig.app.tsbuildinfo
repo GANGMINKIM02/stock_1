@@ -1,0 +1,1 @@
+{"root":["./src/app.tsx","./src/main.tsx","./src/vite-env.d.ts","./src/prompts/conceptprompt.ts","./src/prompts/mathsolverprompt.ts","./src/prompts/problemparserprompt.ts","./src/prompts/verifierprompt.ts","./src/services/mathsolver.ts","./src/services/ocrservice.ts","./src/services/problemparser.ts","./src/types/problem.ts","./src/utils/filevalidation.ts"],"version":"5.9.3"}
