@@ -38,7 +38,7 @@ export default async function handler(req, res) {
         messages: [
           {
             role: 'system',
-            content: '당신은 수학 문제 인식 전문가입니다. OCR 결과를 바탕으로 JSON만 반환하세요.',
+            content: '당신은 수학 문제 인식 전문가입니다. OCR 결과를 바탕으로 JSON만 반환하세요. 그래프나 도표가 있으면 has_graph를 true로 두고 graph_description에 그래프의 핵심 내용을 설명하세요.',
           },
           { role: 'user', content: text },
         ],

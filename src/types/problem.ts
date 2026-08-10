@@ -13,6 +13,7 @@ export interface ProblemStructure {
   equations: string[];
   has_graph: boolean;
   has_table: boolean;
+  graph_description?: string;
   ocr_uncertain_parts: string[];
 }
 

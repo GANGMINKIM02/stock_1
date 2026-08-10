@@ -182,6 +182,15 @@ body {
   color: #334155;
 }
 
+.recognition-iframe {
+  width: 100%;
+  min-height: 260px;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  background: #fff;
+  margin-bottom: 12px;
+}
+
 .meta-block ul,
 .concept-grid ul {
   padding-left: 18px;

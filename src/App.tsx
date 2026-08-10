@@ -5,6 +5,15 @@ import { parseProblemToStructure } from './services/problemParser';
 import { solveProblem } from './services/mathSolver';
 import { ProblemStructure, SolutionResult } from './types/problem';
 
+function escapeHtml(value: string) {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 function App() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>('');
@@ -58,6 +67,33 @@ function App() {
 
   const summary = useMemo(() => structuredProblem?.problem_text ?? '', [structuredProblem]);
 
+  const recognitionHtml = useMemo(() => {
+    const base = structuredProblem ?? {
+      problem_text: problemText || '인식된 문제가 없습니다.',
+      question: '문제의 질문을 확인해 주세요.',
+      conditions: [],
+      choices: [],
+      equations: [],
+      has_graph: false,
+      has_table: false,
+      graph_description: '그래프 설명이 아직 없습니다.',
+      ocr_uncertain_parts: [],
+    };
+
+    const sections = [
+      `<h1>문제 인식 결과</h1>`,
+      `<p><strong>문제 텍스트</strong><br>${escapeHtml(base.problem_text || '인식된 텍스트가 없습니다.')}</p>`,
+      `<p><strong>질문</strong><br>${escapeHtml(base.question || '질문을 찾을 수 없습니다.')}</p>`,
+      base.conditions.length ? `<p><strong>조건</strong><br>${base.conditions.map((item) => `• ${escapeHtml(item)}`).join('<br>')}</p>` : '',
+      base.choices.length ? `<p><strong>선택지</strong><br>${base.choices.map((item) => `• ${escapeHtml(item)}`).join('<br>')}</p>` : '',
+      base.equations.length ? `<p><strong>수식</strong><br>${base.equations.map((item) => `• ${escapeHtml(item)}`).join('<br>')}</p>` : '',
+      `<p><strong>그래프/도표</strong><br>${escapeHtml(base.has_graph ? (base.graph_description || '그래프 설명을 확인할 수 없습니다.') : '그래프나 도표는 감지되지 않았습니다.')}</p>`,
+      base.ocr_uncertain_parts.length ? `<p><strong>인식 확인 필요</strong><br>${base.ocr_uncertain_parts.map((item) => `• ${escapeHtml(item)}`).join('<br>')}</p>` : '',
+    ].filter(Boolean).join('');
+
+    return `<!doctype html><html><head><style>body{font-family:Inter,Segoe UI,sans-serif;padding:16px;color:#0f172a;line-height:1.6;}h1{font-size:18px;margin:0 0 10px;}p{margin:0 0 10px;}strong{color:#4f46e5;}</style></head><body>${sections}</body></html>`;
+  }, [problemText, structuredProblem]);
+
   return (
     <div className="app-shell">
       <header className="hero-card">
@@ -99,29 +135,10 @@ function App() {
         <section className="panel">
           <div className="panel-title-row">
             <h2>문제 인식 결과</h2>
-            <span>OCR</span>
+            <span>OCR + PARSE</span>
           </div>
+          <iframe title="문제 인식 결과" className="recognition-iframe" srcDoc={recognitionHtml} />
           <p className="summary-text">{summary || '인식된 문제가 없습니다.'}</p>
-          {structuredProblem && (
-            <div className="meta-block">
-              <h3>조건</h3>
-              <ul>
-                {structuredProblem.conditions.map((condition) => (
-                  <li key={condition}>{condition}</li>
-                ))}
-              </ul>
-              {structuredProblem.choices.length > 0 && (
-                <div>
-                  <h3>선택지</h3>
-                  <ul>
-                    {structuredProblem.choices.map((choice) => (
-                      <li key={choice}>{choice}</li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </div>
-          )}
         </section>
       </div>
 
