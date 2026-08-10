@@ -2,7 +2,7 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const llmApiKey = process.env.LLM_API_KEY || process.env.OPENAI_API_KEY;
+const upstageApiKey = process.env.UPSTAGE_API_KEY;
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -12,7 +12,7 @@ export default async function handler(req, res) {
 
   const problem = req.body?.problem;
 
-  if (!llmApiKey) {
+  if (!upstageApiKey) {
     res.status(200).json({
       problem_summary: '문제의 핵심을 요약합니다.',
       solution_steps: [
@@ -29,14 +29,14 @@ export default async function handler(req, res) {
   }
 
   try {
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    const response = await fetch('https://api.upstage.ai/v1/solar/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${llmApiKey}`,
+        Authorization: `Bearer ${upstageApiKey}`,
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model: 'solar-pro',
         messages: [
           {
             role: 'system',
